@@ -33,4 +33,8 @@ Los normales se refieren a los que están implícitos en lo que queremos obtener
 
 ## Stubs: Mocks and Spies
 
-Se usan cuando queremos saber si una función ha sido llamada o no.
+Se usan cuando queremos saber si una función ha sido llamada o no. Los spies no modifican el comportamiento de la función, los mocks si.
+
+## Coverage
+
+Es una métrica que nos indica
