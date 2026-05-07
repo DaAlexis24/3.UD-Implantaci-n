@@ -106,7 +106,9 @@ describe('Given fizzBuzzSerie function', () => {
     test('Then console.log would be call 10 times ', () => {
       //Arrange
       const limit = 10;
-      vi.spyOn(console, 'log');
+      vi.spyOn(console, 'log').mockImplementation(() => {
+        //
+      });
       // Act
       fizzBuzzSerie(limit);
       // Assert

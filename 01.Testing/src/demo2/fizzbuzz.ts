@@ -15,7 +15,7 @@ export function fizzbuzz(n: number): string {
 
 // Función que imprima cosas es un void
 export function fizzBuzzSerie(limit = 100): void {
-  for (let i = 0; i < limit; i++) {
+  for (let i = 1; i <= limit; i++) {
     console.log(fizzbuzz(i));
   }
 }
