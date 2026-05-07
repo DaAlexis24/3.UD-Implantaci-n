@@ -21,4 +21,15 @@ describe('Given FizzBuzz function', () => {
       expect(result).toBe(expectedOutput);
     });
   });
+  describe('When it receives 5', () => {
+    test('Then it should return Buzz', () => {
+      // Arrange
+      const input = 5;
+      const expectedOutput = 'Buzz';
+      // Act
+      const result = fizzbuzz(input);
+      // Assert
+      expect(result).toBe(expectedOutput);
+    });
+  });
 });

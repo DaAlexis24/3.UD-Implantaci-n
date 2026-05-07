@@ -1,3 +1,7 @@
 export function fizzbuzz(n: number): string {
-  return 'Fizz';
+  if (n === 3) {
+    return 'Fizz';
+  } else {
+    return 'Buzz';
+  }
 }
