@@ -38,3 +38,7 @@ Se usan cuando queremos saber si una función ha sido llamada o no. Los spies no
 ## Coverage
 
 Es una métrica que nos indica
+
+## Corner Cases
+
+Son "casos raros" que nos ayudan a comprobar la robustez de nuestra aplicación, ya que se comportan de una manera diferente porque tienden a lanzar errores.
