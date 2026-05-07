@@ -26,3 +26,11 @@ Al ser parte de la comprobación de la calidad y la eficacia de la aplicación, 
 ### Archivo de Configuración
 
 Es recomendable crear el archivo **vitest.config.js** en la raíz del proyecto
+
+## Casos de Testing
+
+Los normales se refieren a los que están implícitos en lo que queremos obtener de nuestro componente o función
+
+## Stubs: Mocks and Spies
+
+Se usan cuando queremos saber si una función ha sido llamada o no.
