@@ -7,7 +7,8 @@
  * - Múltiplos de 3 y de 5 a la vez por la palabra "fizzbuzz".
  */
 
-import { fizzbuzz } from './fizzbuzz.ts';
+import { vi } from 'vitest';
+import { fizzbuzz, fizzBuzzSerie } from './fizzbuzz.ts';
 
 describe('Given FizzBuzz function', () => {
   describe('When it receives 3', () => {
@@ -104,8 +105,12 @@ describe('Given fizzBuzzSerie function', () => {
   describe('When its calls 10 times', () => {
     test('Then console.log would be call 10 times ', () => {
       //Arrange
+      const limit = 10;
+      vi.spyOn(console, 'log');
       // Act
+      fizzBuzzSerie(limit);
       // Assert
+      expect(console.log).toHaveBeenCalledTimes(limit);
     });
   });
 });

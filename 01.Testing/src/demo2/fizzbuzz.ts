@@ -19,3 +19,5 @@ export function fizzBuzzSerie(limit = 100): void {
     console.log(fizzbuzz(i));
   }
 }
+
+fizzBuzzSerie();
