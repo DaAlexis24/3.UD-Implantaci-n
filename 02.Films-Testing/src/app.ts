@@ -1,0 +1,100 @@
+import { env } from './config/env.ts';
+import debug from 'debug';
+import express from 'express';
+import morgan from 'morgan';
+import cors from 'cors';
+import { customHeaders } from './middleware/customs.ts';
+import { HttpError } from './errors/http-error.ts';
+import { errorHandler } from './middleware/error-handler.ts';
+import { HomeView } from './views/home.ts';
+import type { AppPrismaClient } from './config/db-config.ts';
+import { UsersRepo } from './users/repo/users.repo.ts';
+import { UsersController } from './users/controllers/users.controller.ts';
+import { UsersRouter } from './users/router/users.route.ts';
+
+import type { TokenPayload } from './types/login.ts';
+import { AuthInterceptor } from './middleware/auth.interceptor.ts';
+import { FilmsRepo } from './films/repo/films.repo.ts';
+import { FilmsController } from './films/controllers/films.controller.ts';
+import { FilmsRouter } from './films/router/films.routes.ts';
+import { GenresRepo } from './genres/repo/genres.repo.ts';
+import { GenresController } from './genres/controllers/genres.controller.ts';
+import { GenresRouter } from './genres/router/genres.routes.ts';
+import { ReviewsRepo } from './reviews/repo/reviews.repo.ts';
+import { ReviewsController } from './reviews/controllers/reviews.controller.ts';
+import { ReviewsRouter } from './reviews/router/reviews.routes.ts';
+
+declare module 'express' {
+  interface Request {
+    user?: TokenPayload;
+  }
+}
+
+export const createApp = (prisma: AppPrismaClient) => {
+  const log = debug(`${env.PROJECT_NAME}:app`);
+  log('Starting Express app...');
+  const app = express();
+  app.disable('x-powered-by');
+  // Middleware Utilities
+  app.use(morgan('dev'));
+  app.use(
+    cors({
+      origin: '*',
+    }),
+  );
+  app.use(express.json());
+  app.use(express.urlencoded());
+  app.use(customHeaders(env.PROJECT_NAME));
+
+  app.use(express.static('public'));
+
+  app.use('/health', (_req, res) => {
+    return res.json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  app.get('/', async (_req, res) => {
+    log('Received request to root endpoint');
+    return res.send(HomeView.render());
+  });
+
+  app.get('/api', (_req, res) => {
+    log('Received request to root endpoint');
+    return res.send(HomeView.render());
+  });
+
+  // Inicializamos los features
+  const authInterceptor = new AuthInterceptor();
+
+  const appRepo = new UsersRepo(prisma);
+  const appController = new UsersController(appRepo);
+  const appRouter = new UsersRouter(appController, authInterceptor);
+  app.use('/api/users', appRouter.router);
+
+  const filmsRepo = new FilmsRepo(prisma);
+  const filmsController = new FilmsController(filmsRepo);
+  const filmsRouter = new FilmsRouter(filmsController, authInterceptor);
+  app.use('/api/films', filmsRouter.router);
+
+  const genresRepo = new GenresRepo(prisma);
+  const genresController = new GenresController(genresRepo);
+  const genresRouter = new GenresRouter(genresController, authInterceptor);
+  app.use('/api/genres', genresRouter.router);
+
+  const reviewsRepo = new ReviewsRepo(prisma);
+  const reviewsController = new ReviewsController(reviewsRepo);
+  const reviewsRouter = new ReviewsRouter(reviewsController, authInterceptor);
+  app.use('/api/reviews', reviewsRouter.router);
+
+  app.use((_req, _res, next) => {
+    log('Calling errorHandler for 404 error');
+    const error = new HttpError(404, 'Not Found', 'Resource not found');
+    next(error);
+  });
+
+  app.use(errorHandler);
+
+  return app;
+};
