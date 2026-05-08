@@ -16,21 +16,15 @@ export class FilmsRepo {
   // selecciono todas las películas
   async getAllFilms(): Promise<Film[]> {
     log('Getting all films!');
-    return this.#prisma.film.findMany({
+    return await this.#prisma.film.findMany({
       include: {
         genres: {
           omit: {
             id: true,
           },
         },
-        // reviews: {
-        //   omit: {
-        //     filmID: true,
-        //     userID: true,
-        //   },
-        // },
       },
-    }) as Promise<Film[]>;
+    });
   }
 
   async getFilmById(id: number): Promise<Film> {

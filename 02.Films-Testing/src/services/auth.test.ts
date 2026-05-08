@@ -1,6 +1,5 @@
 import type { TokenPayload } from '../types/login';
 import { AuthService } from './auth';
-
 describe('Given method hash from class AuthService', () => {
   describe('When it is executed', () => {
     test('Then return a string', async () => {
