@@ -7,13 +7,13 @@ export const EnvSchema = z.object({
   NODE_ENV: z.enum(['dev', 'prod', 'test']),
   DEBUG: z.string().optional(),
   PROJECT_NAME: z.string(),
+  SALT_ROUNDS: z.coerce.number().optional(),
   JWT_SECRET: z.string().min(32),
   PGUSER: z.string(),
   PGPASSWORD: z.string(),
   PGHOST: z.string(),
   PGPORT: z.coerce.number(),
   PGDATABASE: z.string(),
-  SALT_ROUNDS: z.coerce.number().optional(),
 });
 
 export type Env = z.infer<typeof EnvSchema>;
