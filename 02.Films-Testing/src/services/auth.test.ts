@@ -70,11 +70,11 @@ describe('Given method verifyToken from class AuthService', () => {
   });
 
   describe('When it is executed with INVALID token', () => {
-    test('Then it would reject the promise', () => {
+    test('Then it would reject the promise', async () => {
       // Arrange
       const badToken = 'no soy un token';
       // Act + Assert
-      expect(AuthService.verifyTokenAsync(badToken)).rejects.toThrow();
+      await expect(AuthService.verifyTokenAsync(badToken)).rejects.toThrow();
     });
   });
 });
