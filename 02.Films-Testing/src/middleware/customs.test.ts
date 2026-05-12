@@ -1,7 +1,7 @@
 import { customHeaders } from './customs';
 import type { Request, Response, NextFunction } from 'express';
 
-describe('Given customHeaders function', () => {
+describe('Given customHeader middleware', () => {
   let req: Request;
   let res: Response;
   let next: NextFunction;
@@ -12,15 +12,24 @@ describe('Given customHeaders function', () => {
     next = vitest.fn() as NextFunction;
   });
 
-  describe('When it receives a string', () => {
-    test('Then it return a res with a X-Project header and project', () => {
+  describe('When the middleware has created and called', () => {
+    test('Then next would be called without arguments', () => {
       // Arrange
       const project = '';
+      const middleware = customHeaders(project);
       // Act
-      customHeaders(project);
+      middleware(req, res, next);
       // Assert
+      expect(next).toHaveBeenCalledWith();
+    });
+
+    test('And the middleware would return setHeader with information', () => {
+      const project = '';
+      const middleware = customHeaders(project);
+
+      middleware(req, res, next);
+
       expect(res.setHeader).toHaveBeenCalledWith('X-Project', project);
-      expect(next).toHaveBeenCalled();
     });
   });
 });
