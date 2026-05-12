@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import { Role } from '../../generated/prisma/client.ts';
-import type { RegisterUserData } from '../zod/user.schema.ts';
+import type { RegisterUserDTO } from '../users/entities/user.dto.ts';
 import { filmSeed, reviewSeed, userSeed } from './db.seed.ts';
 
 const FILMS = [
@@ -35,7 +35,7 @@ const FILMS = [
 
 const GENRES = [{ name: 'Action' }, { name: 'Drama' }, { name: 'Crime' }];
 
-const USERS: RegisterUserData[] = [
+const USERS: RegisterUserDTO[] = [
   {
     email: 'erni@sample.com',
     password: '123456',
