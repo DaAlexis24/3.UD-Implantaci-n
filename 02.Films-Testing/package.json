@@ -13,7 +13,7 @@
         "seed:test": "npm run db:push:test && npm run db:seed:test",
         "test": "vitest",
         "test:c": "vitest run --coverage",
-        "e2e": "vitest -c vitest.config.e2e.js"
+        "e2e": "vitest -c vitest.config.e2e.js --maxConcurrency=1"
     },
     "keywords": [],
     "author": "",

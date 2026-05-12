@@ -107,3 +107,5 @@ beforeEach(() => {
 Al tener un API REST, este test se puede realizar con herramientas externas como Postman. O también podemos buscar algo más integrado con nuestro entorno de pruebas, aquí entran los **super Tests**
 
 Estos archivos suelen estar definidos como **.spec** o **.e2e**
+
+Sirve para testear rutas o los endpoints de una aplicación

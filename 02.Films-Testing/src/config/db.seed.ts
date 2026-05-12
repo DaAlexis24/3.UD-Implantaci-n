@@ -2,18 +2,19 @@ import { env } from './env.ts';
 import debug from 'debug';
 import { connectDB } from './db-config.ts';
 import { Role } from '../../generated/prisma/client.ts';
-import type { RegisterUserData } from '../zod/user.schema.ts';
+import type { RegisterUserDTO } from '../users/entities/user.dto.ts';
 import FILMS from '../../data/films.json' with { type: 'json' };
 import GENRES from '../../data/genres.json' with { type: 'json' };
 import { AuthService } from '../services/auth.ts';
 import { fileURLToPath } from 'node:url';
-import type { FilmCreateDTO, GenreCreateDTO } from '../zod/film.schema.ts';
+import type { FilmCreateDTO } from '../films/entities/film.dto.ts';
+import type { GenreCreateDTO } from '../genres/entities/genre.dto.ts';
 
 const log = debug(`${env.PROJECT_NAME}:configDB`);
 
 log('Loaded database connection...');
 
-const USERS: RegisterUserData[] = [
+const USERS: RegisterUserDTO[] = [
   {
     email: 'erni@sample.com',
     password: '123456',
@@ -53,9 +54,12 @@ export const filmSeed = async (
   const prisma = await connectDB();
   log('Seeding to database...');
 
-  await prisma.review.deleteMany();
-  await prisma.film.deleteMany();
-  await prisma.genre.deleteMany();
+  await prisma.$executeRaw`TRUNCATE TABLE "reviews" RESTART IDENTITY CASCADE`;
+  // await prisma.review.deleteMany();
+  await prisma.$executeRaw`TRUNCATE TABLE "films" RESTART IDENTITY CASCADE`;
+  // await prisma.film.deleteMany();
+  await prisma.$executeRaw`TRUNCATE TABLE "genres" RESTART IDENTITY CASCADE`;
+  // await prisma.genre.deleteMany();
 
   await prisma.genre.createMany({
     data: genres,
@@ -79,13 +83,16 @@ export const filmSeed = async (
   }
 };
 
-export const userSeed = async (users: RegisterUserData[]) => {
+export const userSeed = async (users: RegisterUserDTO[]) => {
   const prisma = await connectDB();
   log('Seeding users to database...');
 
-  await prisma.review.deleteMany();
-  await prisma.profile.deleteMany();
-  await prisma.user.deleteMany();
+  await prisma.$executeRaw`TRUNCATE TABLE "reviews" RESTART IDENTITY CASCADE`;
+  // await prisma.review.deleteMany();
+  await prisma.$executeRaw`TRUNCATE TABLE "profiles" RESTART IDENTITY CASCADE`;
+  // await prisma.profile.deleteMany();
+  await prisma.$executeRaw`TRUNCATE TABLE "users" RESTART IDENTITY CASCADE`;
+  // await prisma.user.deleteMany();
 
   for (const user of users) {
     const hashedPassword = await AuthService.hash(user.password);
@@ -107,7 +114,8 @@ export const reviewSeed = async () => {
   const prisma = await connectDB();
   log('Seeding reviews to database...');
 
-  await prisma.review.deleteMany();
+  await prisma.$executeRaw`TRUNCATE TABLE "reviews" RESTART IDENTITY CASCADE`;
+  // await prisma.review.deleteMany();
 
   const users = await prisma.user.findMany();
   const films = await prisma.film.findMany();
