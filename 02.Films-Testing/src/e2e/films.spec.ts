@@ -23,9 +23,20 @@ describe('Given a router for films', () => {
   });
 
   test('[GET] /api/films', async () => {
-    await request(app).get(urlBase).expect(200);
+    const response = await request(app).get(urlBase).expect(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body.length).toBe(3);
   });
   test('[GET] /api/films/1', async () => {
-    await request(app).get(`${urlBase}/1`).expect(200);
+    const response = await request(app).get(`${urlBase}/1`).expect(200);
+    expect(response.body.id).toBe(1);
+  });
+
+  test('[GET] /api/films/100', async () => {
+    await request(app).get(`${urlBase}/100`).expect(500);
+  });
+
+  test('[POST] /api/films', async () => {
+    await request(app).post(urlBase).send({}).expect(201);
   });
 });
