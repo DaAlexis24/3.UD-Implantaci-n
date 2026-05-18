@@ -4,39 +4,54 @@ import './menu.css';
 type MenuType = 'mobile-menu' | 'full-menu';
 
 export class Menu extends HTMLElement {
-    static #selector = 'app-menu';
-    static render(routes: Route[]) {
-        if (customElements.get(Menu.#selector) === undefined) {
-            customElements.define(Menu.#selector, Menu);
-        }
-        const elements = document.querySelectorAll(Menu.#selector);
-        elements.forEach((element) => {
-            (element as Menu).routes = routes;
-        });
+  static #selector = 'app-menu';
+  static #routes: Route[] = [];
+  static register(routes: Route[]) {
+    if (customElements.get(Menu.#selector) === undefined) {
+      customElements.define(Menu.#selector, Menu);
     }
+    Menu.#routes = routes;
+    Menu.setOptions();
+  }
 
-    #menuOptions: Route[] = [];
-    #menuType: MenuType = 'full-menu';
-    #template!: string;
+  static setOptions(routes: Route[] = Menu.#routes) {
+    const elements = document.querySelectorAll(Menu.#selector);
+    elements.forEach((element) => {
+      // DI de rutas a cada instancia de menu
+      (element as Menu).routes = routes;
+    });
+  }
 
-    set routes(menuOptions: Route[]) {
-        this.#menuOptions = menuOptions;
-        this.#setTemplate();
-        this.#setElement();
-    }
+  #menuOptions: Route[] = [];
+  #menuType: MenuType = 'full-menu';
+  #template!: string;
 
-    constructor() {
-        super();
-        this.#menuType = this.dataset.type as MenuType;
+  set routes(menuOptions: Route[]) {
+    this.#menuOptions = menuOptions;
+    this.#setTemplate();
+    this.#render();
+  }
 
-        // Tras  el constructor
-        // LLamar a set Routes(menuOptions) para
-        // inyectar las rutas y que se renderice el menu;
-    }
+  constructor() {
+    super();
+    this.#menuType = this.getAttribute('menu-type') as MenuType;
 
-    #setTemplate() {
-        if (this.#menuType === 'mobile-menu') {
-            this.#template = /*html*/ `
+    // Tras  el constructor
+    // LLamar a set Routes(menuOptions) para
+    // inyectar las rutas y que se renderice el menu;
+  }
+
+  disconnectedCallback() {
+    // Limpieza de recursos, por ejemplo, eliminar event listeners
+    document.body.removeEventListener(
+      'click',
+      this.#handleDialogMenu.bind(this),
+    );
+  }
+
+  #setTemplate() {
+    if (this.#menuType === 'mobile-menu') {
+      this.#template = /*html*/ `
             <menu class="mobile-menu">
                 <li>
                     <a href="#" id="menu-icon">
@@ -54,65 +69,62 @@ export class Menu extends HTMLElement {
                 </li>
             </menu>
         `;
-            return;
-        }
-        // else {
-        this.#template = /*html*/ `
+      return;
+    }
+    // else {
+    this.#template = /*html*/ `
             <menu class="menu ${this.#menuType}">
                 ${this.#menuOptions
-                    .map(
-                        (option) =>
-                            `<li><a href="${option.path}">${option.label}</a></li>`,
-                    )
-                    .join('')}
+                  .map(
+                    (option) =>
+                      `<li><a href="${option.path}">${option.label}</a></li>`,
+                  )
+                  .join('')}
             </menu>
         `;
+  }
+
+  #render() {
+    this.innerHTML = this.#template;
+
+    const menuIconElement = this.querySelector('#menu-icon');
+    if (menuIconElement) {
+      menuIconElement.addEventListener(
+        'click',
+        this.#handleDialogMenu.bind(this),
+      );
+    } else {
+      this.addEventListener('click', this.#handleDialogMenu.bind(this));
     }
 
-    #setElement() {
-        this.innerHTML = this.#template;
+    document.body.addEventListener('click', this.#handleDialogMenu.bind(this));
+  }
 
-        const menuIconElement = this.querySelector('#menu-icon');
-        if (menuIconElement) {
-            menuIconElement.addEventListener(
-                'click',
-                this.#handleDialogMenu.bind(this),
-            );
-        } else {
-            this.addEventListener('click', this.#handleDialogMenu.bind(this));
-        }
-
-        document.body.addEventListener(
-            'click',
-            this.#handleDialogMenu.bind(this),
-        );
+  #handleDialogMenu(event: Event) {
+    console.log('Click', event);
+    const current = event.currentTarget as HTMLElement;
+    const target = event.target as HTMLAnchorElement;
+    event.stopPropagation();
+    // console.log("Current");
+    // console.dir(current);
+    // console.log("Target");
+    // console.dir(target);
+    const menuDialogElement = document.querySelector(
+      '#menu-dialog',
+    ) as HTMLDialogElement;
+    if (current.localName === 'a') {
+      // Menu-icon
+      event.preventDefault();
+      menuDialogElement.showModal();
+    } else if (current.localName === 'app-menu') {
+      // Opción del menú
+      event.preventDefault();
+      menuDialogElement.close();
+      navigate(target.href);
+      // const linkHref = event.target.getAttribute("href");
+      // navigate(linkHref);
+    } else {
+      menuDialogElement.close();
     }
-
-    #handleDialogMenu(event: Event) {
-        console.log('Click', event);
-        const current = event.currentTarget as HTMLElement;
-        const target = event.target as HTMLAnchorElement;
-        event.stopPropagation();
-        // console.log("Current");
-        // console.dir(current);
-        // console.log("Target");
-        // console.dir(target);
-        const menuDialogElement = document.querySelector(
-            '#menu-dialog',
-        ) as HTMLDialogElement;
-        if (current.localName === 'a') {
-            // Menu-icon
-            event.preventDefault();
-            menuDialogElement.showModal();
-        } else if (current.localName === 'app-menu') {
-            // Opción del menú
-            event.preventDefault();
-            menuDialogElement.close();
-            navigate(target.href);
-            // const linkHref = event.target.getAttribute("href");
-            // navigate(linkHref);
-        } else {
-            menuDialogElement.close();
-        }
-    }
+  }
 }

@@ -5,33 +5,33 @@ import { Menu } from '../menu/menu';
 import './app.css';
 
 export class App extends HTMLElement {
-    static #selector = 'app-root';
-    static render() {
-        if (customElements.get(App.#selector) === undefined) {
-            customElements.define(App.#selector, App);
-        }
-        Header.render();
-        Menu.render(routes);
-        Footer.render();
+  static #selector = 'app-root';
+  static render() {
+    if (customElements.get(App.#selector) === undefined) {
+      customElements.define(App.#selector, App);
     }
+    Header.register();
+    Menu.register(routes);
+    Footer.register();
+  }
 
-    #template!: string;
+  #template!: string;
 
-    constructor() {
-        super();
-        this.#setTemplate();
-        this.#setElement();
-    }
+  constructor() {
+    super();
+    this.#setTemplate();
+    this.#setElement();
+  }
 
-    #setTemplate() {
-        this.#template = /*html*/ `
+  #setTemplate() {
+    this.#template = /*html*/ `
             <app-header></app-header>
             <main></main>
             <app-footer></app-footer>
         `;
-    }
+  }
 
-    #setElement() {
-        this.innerHTML = this.#template;
-    }
+  #setElement() {
+    this.innerHTML = this.#template;
+  }
 }

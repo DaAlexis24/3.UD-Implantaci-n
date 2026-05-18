@@ -215,3 +215,13 @@ Este planteamiento permite aprender primero los fundamentos del CSS aplicado a W
 ## Notas
 
 El proyecto está pensado como material de aprendizaje, por lo que prioriza claridad, modularidad y ejemplos sencillos sobre abstracciones complejas.
+
+## Tests dinámicos - Eventos
+
+Los tests también sirven para verificar si los elementos han cambiado de estado o reciben algún cambio o no. En este caso se usara la función **fireEvent** que nos seleccionará el elemento que queremos verificar junto con el evento que sabemos que va a recibir.
+
+También podemos usar la librería **User Event** para seleccionar los distintos tipos de eventos que puede recibir un elemento.
+
+Esto es útil para verificar la **utilidad** y el **funcionamiento** de nuestros componentes.
+
+
