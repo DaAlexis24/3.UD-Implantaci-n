@@ -1,4 +1,5 @@
 import { Counter } from '../core/components/counter/counter';
+import { Register } from '../core/components/register/register';
 
 export class HomePage extends HTMLElement {
   static #selector = 'app-home-page';
@@ -11,6 +12,7 @@ export class HomePage extends HTMLElement {
     HomePage.#addPage();
     // Render child custom elements
     Counter.register();
+    Register.register();
   }
 
   static get selector() {
@@ -44,6 +46,7 @@ export class HomePage extends HTMLElement {
                 <app-counter counterId="1"></app-counter>
                 <app-counter counterId="2"></app-counter>
                 <app-counter counterId="3"></app-counter>
+                <app-register></app-register>
             </section>
         `;
   }

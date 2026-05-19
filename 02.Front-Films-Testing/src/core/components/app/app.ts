@@ -2,6 +2,7 @@ import { routes } from '../../router/router';
 import { Footer } from '../footer/footer';
 import { Header } from '../header/header';
 import { Menu } from '../menu/menu';
+// import { Register } from '../register/register';
 import './app.css';
 
 export class App extends HTMLElement {
@@ -13,6 +14,7 @@ export class App extends HTMLElement {
     Header.register();
     Menu.register(routes);
     Footer.register();
+    // Register.register();
   }
 
   #template!: string;

@@ -1,10 +1,24 @@
 import { z } from 'zod';
-import { ReviewModelSchema } from './review.entity';
 
 export const ProfileModelSchema = z.object({
   firstName: z.string(),
   surname: z.string(),
-  avatar: z.string(),
+  avatar: z.instanceof(File).optional(),
+});
+
+const UserReviewFilmModelSchema = z
+  .object({
+    title: z.string(),
+    year: z.number(),
+    director: z.string(),
+  })
+  .nullable();
+
+const UserReviewModelSchema = z.object({
+  review: z.string(),
+  rate: z.instanceof(Number),
+  date: z.date(),
+  film: UserReviewFilmModelSchema,
 });
 
 export const UserModelSchema = z.object({
@@ -12,7 +26,7 @@ export const UserModelSchema = z.object({
   email: z.string(),
   role: z.enum(['ADMIN', 'EDITOR', 'USER']),
   profile: ProfileModelSchema.optional(),
-  reviews: z.array(ReviewModelSchema).optional(),
+  reviews: z.array(UserReviewModelSchema).optional(),
 });
 
 export const UserCredentialsModelSchema = UserModelSchema.pick({
@@ -31,6 +45,13 @@ export const UserModelWithProfile = UserModelSchema.extend({
   profile: ProfileModelSchema,
 });
 
+export const RegisterUserModelSchema = UserModelSchema.omit({
+  id: true,
+  reviews: true,
+}).extend({
+  password: z.string(),
+});
+
 export type Profile = z.infer<typeof ProfileModelSchema>;
 export type UserCredentials = z.infer<typeof UserCredentialsModelSchema>;
 export type FullUserCredentials = z.infer<
@@ -38,3 +59,4 @@ export type FullUserCredentials = z.infer<
 >;
 export type User = z.infer<typeof UserModelSchema>;
 export type UserWithProfile = z.infer<typeof UserModelWithProfile>;
+export type RegisterUser = z.infer<typeof RegisterUserModelSchema>;
