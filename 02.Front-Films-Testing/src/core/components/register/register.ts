@@ -1,6 +1,6 @@
 import {
-  RegisterUserModelSchema,
-  type RegisterUser,
+  UserRegisterModelSchema,
+  type UserRegister,
 } from '../../entities/user.entity';
 import './register.css';
 
@@ -21,132 +21,117 @@ export class Register extends HTMLElement {
 
   connectedCallback() {
     this.#render();
-    this.#registerEvent();
   }
 
-  #setTemplate(): void {
-    this.#template = /*html*/ `
-      <form class="register" aria-label="registro de usuario">
-        <h2>Registro</h2>
-        <label>
-          Email
-          <input type="email" name="email" required autocomplete="email" />
-        </label>
-        <label>
-          Contraseña
-          <input
-            type="password"
-            name="password"
-            required
-            autocomplete="new-password"
-          />
-        </label>
-        <label>
-          Rol
-          <select disabled aria-describedby="role-info">
-            <option value="USER" selected>Usuario</option>
-            <option value="EDITOR">Editor</option>
-            <option value="ADMIN">Administrador</option>
-          </select>
-          <input type="hidden" name="role" value="USER" />
-          <span id="role-info">El registro crea siempre usuarios.</span>
-        </label>
-        <fieldset>
-          <legend>Perfil</legend>
-          <label>
-            Nombre
-            <input type="text" name="firstName" autocomplete="given-name" />
-          </label>
-          <label>
-            Apellidos
-            <input type="text" name="surname" autocomplete="family-name" />
-          </label>
-          <label>
-            Avatar
-            <input type="file" name="avatar" autocomplete="photo" />
-          </label>
-        </fieldset>
-        <p class="register__error" aria-live="polite"></p>
-        <button type="submit">Crear cuenta</button>
-      </form>
-    `;
+  #setTemplate() {
+    this.#template =
+      /*html*/
+      `<section class="register" aria-labelledby='h2'>
+                <h2 id="h2">Registro</h2>
+                <form novalidate aria-label="form">
+                    <label>
+                        Email
+                        <input name="email" type="email" autocomplete="email" required />
+                    </label>
+                    <label>
+                        Password
+                        <input name="password" type="password" autocomplete="new-password" required minlength="8" />
+                    </label>
+                    <label>
+                        Rol
+                        <input name="role" type="hidden" value="USER" />
+                        <select name="role_select" disabled>
+                            <option value="USER" selected>USER</option>
+                            <option value="EDITOR">EDITOR</option>
+                            <option value="ADMIN">ADMIN</option>
+                        </select>
+                    </label>
+                    <fieldset>
+                        <legend>Perfil</legend>
+                        <label>
+                            Nombre
+                            <input name="firstName" type="text" autocomplete="given-name" required />
+                        </label>
+                        <label>
+                            Apellidos
+                            <input name="surname" type="text" autocomplete="family-name" required />
+                        </label>
+                        <label>
+                            Avatar
+                            <input name="avatar" type="file" accept="image/*" />
+                        </label>
+                    </fieldset>
+                    <div role="alert" class="error" aria-live="polite"></div>
+                    <button type="submit">Crear cuenta</button>
+                </form>
+            </section>`;
   }
 
-  #render(): void {
+  #render() {
     this.innerHTML = this.#template;
+    this.#registerEvents();
   }
 
-  #registerEvent() {
+  #registerEvents() {
     const form = this.querySelector('form');
     if (!form) return;
-    form.addEventListener('submit', this.#handleSubmit);
+    form.addEventListener('submit', (ev) => this.#handlerSubmit(ev));
   }
 
-  #handleSubmit = (event: Event) => {
-    event.preventDefault();
-    const form = event.currentTarget as HTMLFormElement;
-    const formData = new FormData(form);
-    const userData = this.#getUserData(formData);
-    const result = RegisterUserModelSchema.safeParse(userData);
+  #handlerSubmit(ev: SubmitEvent) {
+    ev.preventDefault();
 
+    const form = ev.currentTarget as HTMLFormElement;
+    const formData = new FormData(form);
+
+    const email = String(formData.get('email') ?? '').trim();
+    const password = String(formData.get('password') ?? '');
+
+    const firstName = String(formData.get('firstName') ?? '').trim();
+    const surname = String(formData.get('surname') ?? '').trim();
+    const avatar = formData.get('avatar');
+
+    const payload: UserRegister = {
+      email,
+      password,
+      role: 'USER',
+      profile: {
+        firstName,
+        surname,
+      },
+    };
+
+    if (avatar instanceof File && avatar.size > 0) {
+      payload.profile.avatar = avatar;
+    }
+
+    const result = UserRegisterModelSchema.safeParse(payload);
     if (!result.success) {
-      this.#handleError(result.error.message);
+      this.#setError(result.error.issues.map((i) => i.message).join(' · '));
       return;
     }
 
-    this.#clearError();
-    
-    this.dispatchEvent(
-      new CustomEvent<RegisterUser>('user:register', {
-        detail: result.data,
+    this.#setError('');
+
+    const event = new CustomEvent<UserRegister & { data: FormData }>(
+      'user:register',
+      {
+        detail: {
+          ...result.data,
+          data: formData,
+        },
         bubbles: true,
         composed: true,
-      }),
+      },
     );
 
+    this.dispatchEvent(event);
     form.reset();
-  };
-
-  #getUserData(formData: FormData): RegisterUser {
-    const firstName = formData.get('firstName')?.toString() ?? '';
-    const surname = formData.get('surname')?.toString() ?? '';
-    const avatar = formData.get('avatar') as File | null;
-
-    const profile = {
-      firstName,
-      surname,
-      ...(avatar ? { avatar } : {}),
-    };
-
-    return {
-      email: formData.get('email')?.toString() ?? '',
-      password: formData.get('password')?.toString() ?? '',
-      role: formData.get('role')?.toString() as RegisterUser['role'],
-      profile: Object.values(profile).some(Boolean) ? profile : undefined,
-    };
   }
 
-  #handleError(message: string) {
-    const errorElement = this.querySelector('.register__error');
-    if (errorElement) {
-      errorElement.textContent = message;
-    }
-    this.#dispatchInvalidRegisterEvent(message);
-  }
-
-  #clearError() {
-    const errorElement = this.querySelector('.register__error');
-    if (errorElement) {
-      errorElement.textContent = '';
-    }
-  }
-
-  #dispatchInvalidRegisterEvent(message: string) {
-    this.dispatchEvent(
-      new CustomEvent('invalid-register-user', {
-        bubbles: true,
-        detail: { message },
-      }),
-    );
+  #setError(message: string) {
+    const errorEl = this.querySelector('.error');
+    if (!errorEl) return;
+    errorEl.textContent = message;
   }
 }

@@ -223,5 +223,3 @@ Los tests también sirven para verificar si los elementos han cambiado de estado
 También podemos usar la librería **User Event** para seleccionar los distintos tipos de eventos que puede recibir un elemento.
 
 Esto es útil para verificar la **utilidad** y el **funcionamiento** de nuestros componentes.
-
-
