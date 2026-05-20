@@ -229,3 +229,13 @@ Esto es útil para verificar la **utilidad** y el **funcionamiento** de nuestros
 Para instalarlo copiamos esta línea de código en nuestro proyecto: `npm init playwright@latest`
 
 Esto nos creará un fichero donde se guardarán estos tests y un archivo de configuración. A la par te modificará en .gitignore
+
+### Contextos
+
+1. Localizadores: En este caso el objeto page será el encargado de los localizadores de parámetros de accesibilidad. También están los localizadores **Legacy** que se encargan de ubicar atributos, como si fuera un _querySelector_
+
+2. Aserciones: Se encargan de verificar las condiciones que tiene que cumplir un elemento, desde su estado hasta sus valores.
+
+### Entorno de pruebas
+
+Para poder usar Playwright debemos de tener levantado un servidor con nuestro proyecto disponible. En nuestro caso nos sirve usar el localhost

@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "test": "vitest",
-    "test:c": "vitest run --coverage"
+    "test:c": "vitest run --coverage",
+    "e2e": "playwright test --project=chromium"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
