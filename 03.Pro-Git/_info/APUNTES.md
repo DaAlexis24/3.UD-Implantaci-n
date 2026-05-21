@@ -52,3 +52,13 @@ Son los commits y las ramas a los que queremos hacer referencia. Existen distint
 - Absolutas: Identifica un commit o su sub-cadena usando los primos 5 caracteres de su hash
 - Simbólicas: Son las etiquetas de Git. HEAD para la rama actual, las demás ramas que tiene el proyecto y las tags
 - Relativas: Nos ayuda a la hora de acceder a commits anteriores o posteriores según el caso. Usan la virgulilla (~) y el circunflejo (^), aunque este no tanto. Los ejemplos más comunes son: `HEAD~1` para ir al padre del commit actual, `HEAD~n` para el "n" ésimo padre del commit actual.
+
+## Commits
+
+Un commit es el arranque de una estructura de nodos, donde se conectan trees y blobs. Los commits siempre se apuntan a una rama y esta rama suele estar enlazada con la referencia HEAD.
+
+Cada vez que se realiza un nuevo commit la rama activa se posicionará sobre ella. También el nuevo commit estará emparentado con el commit anterior y con todas las "tuberías" que tiene.
+
+## ¿Que hace Git Init?
+
+Crea un fichero donde define que la referencia principal apuntará a la rama **main**
